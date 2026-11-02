@@ -1,0 +1,31 @@
+jenkins:
+  systemMessage: "CI/CD for the wheat yield data tools (cyp_web)"
+  numExecutors: 2
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: "admin"
+          password: "${JENKINS_ADMIN_PASSWORD}"
+  authorizationStrategy: "loggedInUsersCanDoAnything"
+
+unclassified:
+  location:
+    url: "http://localhost:8090/"
+
+jobs:
+  - script: >
+      pipelineJob('cyp_web') {
+        description('Unit tests and Docker image for the wheat yield data tools')
+        definition {
+          cpsScm {
+            scm {
+              git {
+                remote { url('${REPO_URL}') }
+                branch('*/main')
+              }
+            }
+            scriptPath('Jenkinsfile')
+          }
+        }
+      }

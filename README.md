@@ -84,6 +84,30 @@ source venv/bin/activate        # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
+## Docker
+
+The `Dockerfile` has two targets:
+
+```bash
+docker build --target test -t cyp-web-test .    # tools + pytest and flake8
+docker run --rm cyp-web-test                    # runs the tests
+
+docker build -t cyp-web .                       # tools only
+docker run --rm cyp-web                         # rebuilds the yearly dataset
+```
+
+## Jenkins pipeline
+
+The [Jenkinsfile](Jenkinsfile) defines the CI pipeline: checkout, build the test image, lint with flake8, run the unit tests (results are published to Jenkins), build the Docker image, and run it as a smoke test. Jenkins checks the repository for new commits every 2 minutes.
+
+A local Jenkins server with the needed plugins and a ready `cyp_web` job is defined in [jenkins/](jenkins/):
+
+```bash
+docker compose -f jenkins/docker-compose.yml up -d --build
+```
+
+Open http://localhost:8090 and sign in as `admin` (password `admin`, or the value of `JENKINS_ADMIN_PASSWORD`). The job is created from [jenkins/casc.yaml](jenkins/casc.yaml) by the Configuration as Code plugin. The container uses the host Docker through its socket, so it runs as root; it is meant for a local machine only.
+
 ## Testing and continuous integration
 
 ```bash
@@ -95,7 +119,7 @@ pytest -v
 - `tests/test_aggregate.py` checks the aggregation rules, the chronological split, and that the tool reproduces the yearly files in this repository.
 - `tests/test_data.py` checks the yearly files: sizes, years, sites per year, missing values and the yield range.
 
-Every push and pull request to `main` runs the GitHub Actions workflow in [.github/workflows/ci.yml](.github/workflows/ci.yml), which installs the dependencies, lints the code with flake8 and runs the tests.
+Every push and pull request to `main` also runs the GitHub Actions workflow in [.github/workflows/ci.yml](.github/workflows/ci.yml), which installs the dependencies, lints the code with flake8 and runs the tests.
 
 ## Limitations
 

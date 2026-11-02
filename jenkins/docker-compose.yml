@@ -1,0 +1,18 @@
+# Local Jenkins server: docker compose -f jenkins/docker-compose.yml up -d --build
+services:
+  jenkins:
+    build: .
+    container_name: jenkins
+    # root is needed to use the host Docker socket; acceptable for a local server only
+    user: root
+    ports:
+      - "8090:8080"
+    environment:
+      JENKINS_ADMIN_PASSWORD: ${JENKINS_ADMIN_PASSWORD:-admin}
+      REPO_URL: ${REPO_URL:-https://github.com/yeraliev/cyp_web.git}
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+
+volumes:
+  jenkins_home:
