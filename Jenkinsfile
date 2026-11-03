@@ -1,3 +1,4 @@
+// CI pipeline for cyp_web: lint, unit tests and Docker image build on every commit
 pipeline {
     agent any
 
@@ -18,7 +19,7 @@ pipeline {
         IMAGE = 'cyp-web'
         TAG = "${env.BUILD_NUMBER}"
     }
-
+    
     stages {
         stage('Checkout') {
             steps {
